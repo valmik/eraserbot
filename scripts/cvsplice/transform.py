@@ -1,7 +1,7 @@
 # Taken and lightly modified from pyimagesearch.com
 
 import numpy as np
-import cv3
+import cv2
 
 def order_points(pts):
     # initialzie a list of coordinates that will be ordered
@@ -59,8 +59,8 @@ def four_point_transform(image, pts):
         [0, maxHeight - 1]], dtype = "float32")
 
     # compute the perspective transform matrix and then apply it
-    M = cv3.getPerspectiveTransform(rect, dst)
-    warped = cv3.warpPerspective(image, M, (maxWidth, maxHeight))
+    M = cv2.getPerspectiveTransform(rect, dst)
+    warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
     # return the warped image
     return warped

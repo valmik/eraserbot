@@ -6,10 +6,10 @@
 # python transform_example.py --image images/example_03.png --coords "[(63, 242), (291, 110), (361, 252), (78, 386)]"
 
 # import the necessary packages
-import four_point_transform
+from transform import four_point_transform
 import numpy as np
 import argparse
-import cv3
+import cv2
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -23,7 +23,7 @@ args = vars(ap.parse_args())
 # NOTE: using the 'eval' function is bad form, but for this example
 # let's just roll with it -- in future posts I'll show you how to
 # automatically determine the coordinates without pre-supplying them
-image = cv3.imread(args["image"])
+image = cv2.imread(args["image"])
 pts = np.array(eval(args["coords"]), dtype = "float32")
 
 # apply the four point tranform to obtain a "birds eye view" of
@@ -31,6 +31,6 @@ pts = np.array(eval(args["coords"]), dtype = "float32")
 warped = four_point_transform(image, pts)
 
 # show the original and warped images
-cv3.imshow("Original", image)
-cv3.imshow("Warped", warped)
-cv3.waitKey(0)
+cv2.imshow("Original", image)
+cv2.imshow("Warped", warped)
+cv2.waitKey(0)
