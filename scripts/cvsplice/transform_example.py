@@ -33,6 +33,7 @@ pts = np.array(eval(args["coords"]), dtype = "float32")
 warped = four_point_transform(image, pts)
 
 # show the original and warped images
+# Note: These two don't work on the Pi for some reason, but that's fine there are no errors
 cv2.imshow("Original", image)
 cv2.imshow("Warped", warped)
 cv2.waitKey(0)
