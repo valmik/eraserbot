@@ -1,0 +1,7 @@
+<launch>
+    <!-- Observer Node-->
+    <node pkg="eraserbot" type="observer" name="observer.py" respawn="false"/>
+
+    <!-- Broadcaster Node-->
+    <node pkg="eraserbot" type="odometry_broadcaster" name="odometry_broadcaster.py" respawn="false"/>
+</launch>
