@@ -2,12 +2,51 @@
 
 import serial
 import rospy
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import TwistStamped, Vector
+from std_msgs.ms import Header
+
+# http://ozzmaker.com/guide-interfacing-gyro-accelerometer-raspberry-pi-kalman-filter/
+# http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
+
+class AngleKalmanFilter():
+    """docstring for KalmanFilter"""
+    def __init__(self, initial_angle):
+        # Process Noise Covariance (accel, gyro)
+        # Since we assume the accel and gyro are independent,
+        # these are just the variances
+        # When multiplied by delta T, we get the actual covariance
+        # Since we assume that covariance increases linearly with time
+        # These are gained through measurement
+        self.Q_angle = 0.01
+        self.Q_gyro = 0.003
+
+        # Observation measurement covariance
+        # Since there's only one state observation (angle), the 
+        # covariance is just the variance
+        self.R_angle = 0.01
+
+        # Bias, which we initially assume is zero
+        self.z_bias = 0.0
+
+        # Error covariance matrix, which we also assume starts at 0
+        self.P_00 = 0.0
+        self.P_01 = 0.0
+        self.P_10 = 0.0
+        self.P_11 = 0.0
+
+        self.est_angle = 0.0
+
+    def update():
+        
+
+
 
 def state_publisher(ser):
     pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
     rospy.init_node('observer', anonymous=True)
     rospy.Rate(100)
+
+
     while not rospy.is_shutdown():
         read_serial = ser.readline()
         pose = convert_from_serial()
@@ -16,6 +55,10 @@ def state_publisher(ser):
 
 
 def convert_from_serial(ser_str):
+    """
+    This returns the accelerometer, gyro, and encoder data
+
+    """
     pose = TwistStamped()
     pose.header.stamp = rospy.get_time()
     pose.header.frame_id = "odom"
