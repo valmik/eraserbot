@@ -33,6 +33,7 @@ void setup() {
 
 void loop() {
   Serial.println(String(countL) + "," + String(countR));
+  delay(10);
   
 }
 
