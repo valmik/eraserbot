@@ -1,4 +1,4 @@
 <launch>
     <!-- Observer Node-->
-    <node pkg="eraserbot" type="observer" name="observer.py" respawn="false"/>
+    <node pkg="eraserbot" type="observer.py" name="observer" respawn="false"/>
 </launch>
