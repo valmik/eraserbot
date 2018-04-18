@@ -37,20 +37,20 @@ class AngleKalmanFilter():
         self.est_angle = 0.0
 
     def update():
+        print "hi"
         
 
 
-
-"""
-This reads from serial and publishes to the odometry topic
-I'm not publishing directly to the tf2 broadcaster because 
-I've observed tf2 to be pretty slow in the past, and I want to
-read the serial as fast as possible to not fill the buffer in the
-Arduino
-"""
-
-
 def state_publisher(ser):
+
+    """
+    This reads from serial and publishes to the odometry topic
+    I'm not publishing directly to the tf2 broadcaster because 
+    I've observed tf2 to be pretty slow in the past, and I want to
+    read the serial as fast as possible to not fill the buffer in the
+    Arduino
+    """
+
     pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
     rospy.init_node('observer', anonymous=True)
     rospy.Rate(100)
@@ -68,15 +68,19 @@ def convert_from_serial(ser_str):
     This returns the accelerometer, gyro, and encoder data
 
     """
+
+    data = ser_str.split(",")
+    num_data = [float(i) for i in data]
+
     pose = TwistStamped()
     pose.header.stamp = rospy.get_time()
     pose.header.frame_id = "odom"
-    pose.twist.linear.x = 0
-    pose.twist.linear.y = 0
+    pose.twist.linear.x = num_data[0]
+    pose.twist.linear.y = num_data[1]
     pose.twist.linear.z = 0
-    position.twist.angular.x = 0
-    position.twist.angular.y = 0
-    position.twist.angular.z = 0
+    position.twist.angular.x = num_data[2]
+    position.twist.angular.y = num_data[3]
+    position.twist.angular.z = num_data[4]
 
 
 if __name__ == '__main__':

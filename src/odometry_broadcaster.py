@@ -1,6 +1,6 @@
 #!/user/bin/env python
 
-# http://wiki.ros.org/tf/Tutorials/Writing%20a%20tf%20broadcaster%20%28Python%29
+# http://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20broadcaster%20%28Python%29
 
 import rospy
 import tf
@@ -11,10 +11,9 @@ from geometry_msgs.msg import TwistStamped, TransformStamped
 This subscribes to the odom topic and broadcasts to the tf2 tree
 """
 
-def handlePose(msg):
+def handlePose(msg, br):
 
 
-    br = tf2_ros.TransformBroadcaster()
     t = TransformStamped()
     t.header.stamp = msg.header.stamp
     t.header.frame_id = msg.header.frame_id
@@ -33,7 +32,8 @@ def handlePose(msg):
 
 if __name__ == '__main__':
     rospy.init_node('odometry_broadcaster')
-    rospy.Subscriber('/odometry', TwistStamped, handlePose)
+    br = tf2_ros.TransformBroadcaster()
+    rospy.Subscriber('/odometry', TwistStamped, handlePose, br)
     rospy.spin()
 
 

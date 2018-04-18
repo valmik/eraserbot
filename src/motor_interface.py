@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library/blob/master/examples/Robot.py
+# https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/using-dc-motors
+
+
 import rospy
 from geometry_msgs.msg import Twist
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
