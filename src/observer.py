@@ -2,8 +2,8 @@
 
 import serial
 import rospy
-from geometry_msgs.msg import TwistStamped, Vector
-from std_msgs.ms import Header
+from geometry_msgs.msg import TwistStamped, Vector3
+from std_msgs.msg import Header
 
 # http://ozzmaker.com/guide-interfacing-gyro-accelerometer-raspberry-pi-kalman-filter/
 # http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
@@ -53,12 +53,12 @@ def state_publisher(ser):
 
     pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
     rospy.init_node('observer', anonymous=True)
-    rospy.Rate(100)
+    rate = rospy.Rate(100)
 
 
     while not rospy.is_shutdown():
         read_serial = ser.readline()
-        pose = convert_from_serial()
+        pose = convert_from_serial(read_serial)
         pub.publish(pose)
         rate.sleep()
 
@@ -73,18 +73,20 @@ def convert_from_serial(ser_str):
     num_data = [float(i) for i in data]
 
     pose = TwistStamped()
-    pose.header.stamp = rospy.get_time()
+    pose.header.stamp = rospy.Time.now()
     pose.header.frame_id = "odom"
     pose.twist.linear.x = num_data[0]
     pose.twist.linear.y = num_data[1]
     pose.twist.linear.z = 0
-    position.twist.angular.x = num_data[2]
-    position.twist.angular.y = num_data[3]
-    position.twist.angular.z = num_data[4]
+    pose.twist.angular.x = num_data[2]
+    pose.twist.angular.y = num_data[3]
+    pose.twist.angular.z = num_data[4]
+
+    return pose
 
 
 if __name__ == '__main__':
-    ser = serial.Serial('/dev/ttyACM4',9600)
+    ser = serial.Serial('/dev/ttyACM0',9600)
     try:
         state_publisher(ser)
     except rospy.ROSInterruptException:
