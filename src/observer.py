@@ -5,8 +5,13 @@ import rospy
 from geometry_msgs.msg import TwistStamped, Vector3
 from std_msgs.msg import Header
 
+import math
+
 # http://ozzmaker.com/guide-interfacing-gyro-accelerometer-raspberry-pi-kalman-filter/
 # http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
+# https://ieeexplore.ieee.org/document/7014709/?reload=true
+# http://ais.informatik.uni-freiburg.de/teaching/ss11/robotics/slides/06-motion-models.pdf
+
 
 class AngleKalmanFilter():
     """docstring for KalmanFilter"""
@@ -40,55 +45,119 @@ class AngleKalmanFilter():
         print "hi"
         
 
+class StateEstimator():
+    """docstring for StateEstimator"""
+    def __init__(serial_read):
+        # x, y, theta
+        self.pose = self.Vector3Stamped()
+        self.pose.header.stamp = rospy.Time.now()
+        self.pose.header.frame_id = "odom"
+        self.pose.vector = Vector3(0.0, 0.0, 0.0)
 
-def state_publisher(ser):
+        # previous velocity
+        self.velocity = Vector3(0.0, 0.0, 0.0)
 
-    """
-    This reads from serial and publishes to the odometry topic
-    I'm not publishing directly to the tf2 broadcaster because 
-    I've observed tf2 to be pretty slow in the past, and I want to
-    read the serial as fast as possible to not fill the buffer in the
-    Arduino
-    """
+        # Encoder values
+        self.encoderLeft = 0.0
+        self.encoderRight = 0.0
+        self.encoderResolution = 2048.0
 
-    pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
-    rospy.init_node('observer', anonymous=True)
-    rate = rospy.Rate(100)
+        # wheel radius
+        self.R = 112.0 # mm
+        # dist between wheels
+        self.L = 205.0 # mm
+
+        self.ser = serial_read
+
+        self.pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
+        self.rospy.init_node('observer', anonymous=True)
+
+        
+    def state_publisher(self):
+
+        """
+        This reads from serial and publishes to the odometry topic
+        I'm not publishing directly to the tf2 broadcaster because 
+        I've observed tf2 to be pretty slow in the past, and I want to
+        read the serial as fast as possible to not fill the buffer in the
+        Arduino
+        """
+
+        rate = rospy.Rate(100)
+
+        while not rospy.is_shutdown():
+            read_serial = self.ser.readline()
+            data = convert_from_serial(read_serial)
+            self.update(data[0], data[1], data[2], data[3], data[4])
+            self.publish()
+            rate.sleep()
 
 
-    while not rospy.is_shutdown():
-        read_serial = ser.readline()
-        pose = convert_from_serial(read_serial)
-        pub.publish(pose)
-        rate.sleep()
+    def publish(self):
+
+        message = TwistStamped()
+        message.header = self.pose.header
+        message.twist.linear = self.pose.vector
+        message.twist.linear.z = 0.0
+        message.twist.angular = Vector3(0.0, 0.0, self.pose.vector.z)
+        self.pub.publish(message)
 
 
-def convert_from_serial(ser_str):
-    """
-    This returns the accelerometer, gyro, and encoder data
 
-    """
+    def update(self, el, er, ax, ay, gz):
+        """
+        Updates the state using the sensor information
+        Currently uses pure odometry with a first order linearization
+        it does not use the imu yet
+        """
 
-    data = ser_str.split(",")
-    num_data = [float(i) for i in data]
+        new_time = rospy.Time.now()
 
-    pose = TwistStamped()
-    pose.header.stamp = rospy.Time.now()
-    pose.header.frame_id = "odom"
-    pose.twist.linear.x = num_data[0]
-    pose.twist.linear.y = num_data[1]
-    pose.twist.linear.z = 0
-    pose.twist.angular.x = num_data[2]
-    pose.twist.angular.y = num_data[3]
-    pose.twist.angular.z = num_data[4]
+        # difference in radians
+        dr = (er - self.encoderRight)/self.encoderResolution * 2*math.pi
+        dl = (el - self.encoderLeft)/self.encoderResolution * 2*math.pi
 
-    return pose
+        duration = new_time - self.pose.header.stamp
+        tdiff = duration.to_nsec()/(9000000000.0)
+        # convert encoder diffs to nums
+        vr = dr/tdiff
+        vl = dl/tdiff
+
+        new_velocity = Vector3()
+        new_position = Vector3()
+
+        # thetadot
+        new_velocity.z = (self.R/self.L)*(vr - vl)
+        new_position.z = new_velocity.z*tdiff + self.pose.z
+
+        mean_theta = (new_position.z + self.pose.z)/2.0
+        new_velocity.x = (self.R/2.0)*(vr + vl) * math.cos(mean_theta)
+        new_velocity.y = (self.R/2.0)*(vr + vl) * math.sin(mean_theta)
+
+        new_position.x = new_velocity.x*tdiff + self.pose.x
+        new_position.y = new_velocity.y*tdiff + self.pose.y
+
+        self.pose.vector = new_position
+        self.velocity = new_velocity
+
+
+    def convert_from_serial(ser_str):
+        """
+        This returns the accelerometer, gyro, and encoder data
+
+        """
+
+        data = ser_str.split(",")
+        num_data = [float(i) for i in data]
+        # encl, encr, accx, accy, gyrz
+        return num_data
 
 
 if __name__ == '__main__':
     ser = serial.Serial('/dev/ttyACM0',9600)
+    estimator = StateEstimator(ser)
     try:
-        state_publisher(ser)
+        estimator.state_publisher()
     except rospy.ROSInterruptException:
         pass
 
