@@ -15,7 +15,7 @@ class Robot():
         self.mh = Adafruit_MotorHAT(addr=0x60)
         self.left = self.mh.getMotor(left_id)
         self.right = self.mh.getMotor(right_id)
-        atexit.register(turnOffMotors)
+        atexit.register(self.turnOffMotors)
 
 
     # For shutdown
@@ -27,7 +27,7 @@ class Robot():
 
     # def low_level_control(currentVelocity, desiredVelocity):
 
-    def set_speed(sl, sr):
+    def set_speed(self, sl, sr):
         speed_left = max(-255, min(sl, 255))
         speed_right = max(-255, min(sr, 255))
 
@@ -52,5 +52,6 @@ class Robot():
 
 if __name__ == '__main__':
     bot = Robot(1, 2)
-    bot.setSpeed(150, 150)
+    while True:
+        bot.set_speed(150, -150)
 

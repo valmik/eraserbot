@@ -2,7 +2,7 @@
 
 import serial
 import rospy
-from geometry_msgs.msg import TwistStamped, Vector3
+from geometry_msgs.msg import TwistStamped, Vector3, Vector3Stamped
 from std_msgs.msg import Header
 
 import math
@@ -47,9 +47,12 @@ class AngleKalmanFilter():
 
 class StateEstimator():
     """docstring for StateEstimator"""
-    def __init__(serial_read):
+    def __init__(self, serial_read):
+        rospy.init_node('observer', anonymous=True)
+        print "initialized"
+                
         # x, y, theta
-        self.pose = self.Vector3Stamped()
+        self.pose = Vector3Stamped()
         self.pose.header.stamp = rospy.Time.now()
         self.pose.header.frame_id = "odom"
         self.pose.vector = Vector3(0.0, 0.0, 0.0)
@@ -70,7 +73,6 @@ class StateEstimator():
         self.ser = serial_read
 
         self.pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
-        self.rospy.init_node('observer', anonymous=True)
 
         
     def state_publisher(self):
@@ -83,11 +85,13 @@ class StateEstimator():
         Arduino
         """
 
+        print "state publisher started"
         rate = rospy.Rate(100)
 
         while not rospy.is_shutdown():
+            print "in loop"
             read_serial = self.ser.readline()
-            data = convert_from_serial(read_serial)
+            data = self.convert_from_serial(read_serial)
             self.update(data[0], data[1], data[2], data[3], data[4])
             self.publish()
             rate.sleep()
@@ -95,11 +99,16 @@ class StateEstimator():
 
     def publish(self):
 
+        print "publishing"
         message = TwistStamped()
         message.header = self.pose.header
-        message.twist.linear = self.pose.vector
+        message.twist.linear.x = self.pose.vector.x
+        message.twist.linear.y = self.pose.vector.y
         message.twist.linear.z = 0.0
-        message.twist.angular = Vector3(0.0, 0.0, self.pose.vector.z)
+        message.twist.angular.x = 0.0
+        message.twist.angular.y = 0.0
+        message.twist.angular.z = self.pose.vector.z
+        print self.pose.vector.z
         self.pub.publish(message)
 
 
@@ -112,6 +121,8 @@ class StateEstimator():
         """
 
         new_time = rospy.Time.now()
+
+        print "updating"
 
         # difference in radians
         dr = (er - self.encoderRight)/self.encoderResolution * 2*math.pi
@@ -128,25 +139,29 @@ class StateEstimator():
 
         # thetadot
         new_velocity.z = (self.R/self.L)*(vr - vl)
-        new_position.z = new_velocity.z*tdiff + self.pose.z
+        new_position.z = new_velocity.z*tdiff + self.pose.vector.z
 
-        mean_theta = (new_position.z + self.pose.z)/2.0
+        mean_theta = (new_position.z + self.pose.vector.z)/2.0
         new_velocity.x = (self.R/2.0)*(vr + vl) * math.cos(mean_theta)
         new_velocity.y = (self.R/2.0)*(vr + vl) * math.sin(mean_theta)
 
-        new_position.x = new_velocity.x*tdiff + self.pose.x
-        new_position.y = new_velocity.y*tdiff + self.pose.y
+        new_position.x = new_velocity.x*tdiff + self.pose.vector.x
+        new_position.y = new_velocity.y*tdiff + self.pose.vector.y
 
+        print new_position
         self.pose.vector = new_position
+        self.pose.header.stamp = new_time
         self.velocity = new_velocity
+        self.encoderLeft = el
+        self.encoderRight = er
 
 
-    def convert_from_serial(ser_str):
+    def convert_from_serial(self, ser_str):
         """
         This returns the accelerometer, gyro, and encoder data
 
         """
-
+        print "converting from serial"
         data = ser_str.split(",")
         num_data = [float(i) for i in data]
         # encl, encr, accx, accy, gyrz
