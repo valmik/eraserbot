@@ -50,3 +50,7 @@ class Robot():
             self.right.run(Adafruit_MotorHAT.FORWARD)
 
 
+if __name__ == '__main__':
+    bot = Robot(1, 2)
+    bot.setSpeed(150, 150)
+
