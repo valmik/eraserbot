@@ -33,7 +33,7 @@ class Controller():
         Pose is a Vector3 containing desired x,y,theta
         """
 
-        while True:
+        while not rospy.is_shutdown():
             current_pose = self.state
             x = current_pose.x
             y = current_pose.y
@@ -82,6 +82,8 @@ class Controller():
 
         vd = math.cos(tr - t)*vr - u1
         wd = wr - u2
+
+        print ex, ey, vd, wd
 
         return vd, wd
 
