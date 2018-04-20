@@ -78,10 +78,10 @@ class Robot():
         vr = vr/self.max_speed*255
 
         # Scale to +- 255
-        if math.abs(vl) > 255:
+        if abs(vl) > 255:
             vr = vr/vl*255
             vl = vl/vl*255
-        if math.abs(vr) > 255:
+        if abs(vr) > 255:
             vl = vl/vr*255
             vr = vr/vr*255
 
