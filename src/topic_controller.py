@@ -18,7 +18,7 @@ class Controller():
 
         self.state = Vector3(0.0,0.0,0.0)
 
-        self.k1 = 1.0
+        self.k1 = 0.5
         self.k2 = 1.0
         self.k3 = 1.0
 
