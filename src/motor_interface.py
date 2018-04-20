@@ -21,6 +21,11 @@ class Robot():
         # dist between wheels
         self.L = 0.205 # m
 
+        # Calibrated max speed
+        self.max_speed = 6.68 # rad/sec (very approximate)
+
+        # measured minimum speed needed
+        self.min_command = 20 # motor command between 0 and 255
 
         atexit.register(self.turnOffMotors)
 
@@ -60,23 +65,37 @@ class Robot():
     def vw_to_lr(self, vd, wd):
         """
         Converts linear and angular velocity to motor velocities
+        Input is in m/s and rad/s
+        Output is a motor command
         """
+
+        # Find desired speed in rad/s
         vl = ((2.0/self.R)*vd - (self.L/self.R)*wd)/2.0
         vr = (self.L/self.R)*wd + vl
 
-        if vl > 255:
+        # Convert rad/s to motor command
+        vl = vl/self.max_speed*255
+        vr = vr/self.max_speed*255
+
+        # Scale to +- 255
+        if math.abs(vl) > 255:
             vr = vr/vl*255
-            vl = 255
-        if vr > 255:
+            vl = vl/vl*255
+        if math.abs(vr) > 255:
             vl = vl/vr*255
-            vr = 255
+            vr = vr/vr*255
 
         return vl, vr
 
     def lr_to_vw(self, vl, vr):
         """
         Convertes motor velocities to linear and angular velocities
+        Input is a motor command, output is robot velocities in m/s and rad/s
         """
+
+        # Convert command to rad/s
+        vl = vl/255*self.max_speed
+        vr = vr/255*self.max_speed
 
         w = (self.R/self.L)*(vr - vl)
         v = (self.R/2.0)*(vl + vr)
