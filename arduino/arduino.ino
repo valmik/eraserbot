@@ -41,8 +41,8 @@ void loop() {
   GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
   GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
   
-  long PosL = myEncL.read();  // mm/count calibration
-  long PosR = myEncR.read()*-1;  // mm/count calibration
+  long PosL = myEncL.read();  // counts
+  long PosR = myEncR.read()*-1;  // counts
   
   Serial.print(PosL); Serial.print(",");
   Serial.print(PosR); Serial.print(",");
