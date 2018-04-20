@@ -12,7 +12,7 @@ class Controller():
     def __init__(self):
         rospy.init_node("Controller")
 
-        self.bot = motor_interface.Robot()
+        self.bot = motor_interface.Robot(1, 2)
 
         self.odom_sub = rospy.Subscriber('/odometry', TwistStamped, self.update_state)
 
@@ -57,7 +57,7 @@ class Controller():
             vd, wd = self.control(desired_pose, current_pose, vr, wr)
 
             l, r = self.bot.vw_to_lr(vd, wd)
-            self.bot.set_speed(l, r)
+            self.bot.set_speed(int(l), int(r))
 
 
 
@@ -78,7 +78,7 @@ class Controller():
         ey = (math.sin(t) + math.cos(t))*(yr - y)
 
         u1 = -self.k1*ex
-        u2 = k2*vr*np.sinc(tr - t)*ey - k3*(tr - t)
+        u2 = self.k2*vr*np.sinc(tr - t)*ey - self.k3*(tr - t)
 
         vd = math.cos(tr - t)*vr - u1
         wd = wr - u2

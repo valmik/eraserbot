@@ -93,10 +93,24 @@ class Robot():
 
         return vn, wn
 
+    def test_speed(self):
+        """
+        user input for testing motors
+        """
+
+        l = int(raw_input("left motor value"))
+        r = int(raw_input("right motor value"))
+
+        self.set_speed(l, r)
+        rospy.sleep(3)
+        print "stopping"
+        self.turnOffMotors()
+        
+
 
 
 if __name__ == '__main__':
     bot = Robot(1, 2)
     while True:
-        bot.set_speed(150, -150)
+        bot.test_speed()
 
