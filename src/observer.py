@@ -131,7 +131,7 @@ class StateEstimator():
         dl = (el - self.encoderLeft)/self.encoderResolution * 2*math.pi
 
         duration = new_time - self.pose.header.stamp
-        tdiff = duration.to_nsec()/(9000000000.0)
+        tdiff = duration.to_nsec()/(1000000000.0)
         # convert encoder diffs to nums
         vr = dr/tdiff
         vl = dl/tdiff
