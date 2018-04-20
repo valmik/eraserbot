@@ -98,8 +98,8 @@ class Robot():
         user input for testing motors
         """
 
-        l = int(raw_input("left motor value"))
-        r = int(raw_input("right motor value"))
+        l = int(raw_input("left motor value: "))
+        r = int(raw_input("right motor value: "))
 
         self.set_speed(l, r)
         rospy.sleep(3)
