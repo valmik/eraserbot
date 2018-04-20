@@ -15,6 +15,13 @@ class Robot():
         self.mh = Adafruit_MotorHAT(addr=0x60)
         self.left = self.mh.getMotor(left_id)
         self.right = self.mh.getMotor(right_id)
+
+        # wheel radius
+        self.R = 0.112 # m
+        # dist between wheels
+        self.L = 0.205 # m
+
+
         atexit.register(self.turnOffMotors)
 
 
@@ -48,6 +55,44 @@ class Robot():
         else:
             self.right.setSpeed(speed_right)
             self.right.run(Adafruit_MotorHAT.FORWARD)
+
+
+    def vw_to_lr(self, vd, wd):
+        """
+        Converts linear and angular velocity to motor velocities
+        """
+        vl = ((2.0/self.R)*vd - (self.L/self.R)*wd)/2.0
+        vr = (self.L/self.R)*wd + vl
+
+        if vl > 255:
+            vr = vr/vl*255
+            vl = 255
+        if vr > 255:
+            vl = vl/vr*255
+            vr = 255
+
+        return vl, vr
+
+    def lr_to_vw(self, vl, vr):
+        """
+        Convertes motor velocities to linear and angular velocities
+        """
+
+        w = (self.R/self.L)*(vr - vl)
+        v = (self.R/2.0)*(vl + vr)
+
+        return v, w
+
+    def scale_velocity(self, v, w):
+        """
+        scales velocity so that it's achievable
+        """
+
+        l, r = self.vw_to_lr(v, w)
+        vn, wn = self.lr_to_vw(l, r)
+
+        return vn, wn
+
 
 
 if __name__ == '__main__':

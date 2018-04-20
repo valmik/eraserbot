@@ -11,7 +11,9 @@ import math
 # http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
 # https://ieeexplore.ieee.org/document/7014709/?reload=true
 # http://ais.informatik.uni-freiburg.de/teaching/ss11/robotics/slides/06-motion-models.pdf
-
+# https://hackernoon.com/ghost-iv-sensor-fusion-encoders-imu-c099dd40a7b
+# https://robotics.stackexchange.com/questions/382/how-to-fuse-linear-and-angular-data-from-sensors
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5621051/
 
 class AngleKalmanFilter():
     """docstring for KalmanFilter"""
@@ -66,9 +68,9 @@ class StateEstimator():
         self.encoderResolution = 2048.0
 
         # wheel radius
-        self.R = 112.0 # mm
+        self.R = 0.112 # m
         # dist between wheels
-        self.L = 205.0 # mm
+        self.L = 0.205 # m
 
         self.ser = serial_read
 

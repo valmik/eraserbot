@@ -27,7 +27,6 @@ def handlePose(msg, br):
     t.transform.rotation.z = q[2]
     t.transform.rotation.w = q[3]
 
-
     br.sendTransform(t)
 
 if __name__ == '__main__':
