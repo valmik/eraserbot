@@ -65,7 +65,7 @@ class StateEstimator():
         # Encoder values
         self.encoderLeft = 0.0
         self.encoderRight = 0.0
-        self.encoderResolution = 2048.0
+        self.encoderResolution = 8192.0
 
         # wheel radius
         self.R = 0.056 # m
@@ -127,14 +127,20 @@ class StateEstimator():
         print "updating"
 
         # difference in radians
+        print "encoder counts", self.encoderRight, self.encoderLeft
+        
         dr = (er - self.encoderRight)/self.encoderResolution * 2*math.pi
         dl = (el - self.encoderLeft)/self.encoderResolution * 2*math.pi
+
+        print "encoder diffs: ", dr, dl
 
         duration = new_time - self.pose.header.stamp
         tdiff = duration.to_nsec()/(1000000000.0)
         # convert encoder diffs to nums
         vr = dr/tdiff
         vl = dl/tdiff
+
+        print "wheel velocities: ", vr, vl
 
         new_velocity = Vector3()
         new_position = Vector3()
