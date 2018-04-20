@@ -17,7 +17,7 @@ class Robot():
         self.right = self.mh.getMotor(right_id)
 
         # wheel radius
-        self.R = 0.112 # m
+        self.R = 0.056 # m
         # dist between wheels
         self.L = 0.205 # m
 

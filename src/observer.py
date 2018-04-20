@@ -68,7 +68,7 @@ class StateEstimator():
         self.encoderResolution = 2048.0
 
         # wheel radius
-        self.R = 0.112 # m
+        self.R = 0.056 # m
         # dist between wheels
         self.L = 0.205 # m
 
