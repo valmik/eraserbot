@@ -43,6 +43,8 @@ class Robot():
         speed_left = max(-255, min(sl, 255))
         speed_right = max(-255, min(sr, 255))
 
+        print "speed left: ", speed_left, "speed right: ", speed_right
+
 
         if speed_left < 0:
             self.left.setSpeed(-speed_left)
