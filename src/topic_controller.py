@@ -22,6 +22,8 @@ class Controller():
         self.k2 = 1.0
         self.k3 = 1.0
 
+        self.previous = Vector3(0.0, 0.0, 0.0)
+
     def update_state(self, msg):
         self.state.x = msg.twist.linear.x
         self.state.y = msg.twist.linear.y

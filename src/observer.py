@@ -65,6 +65,7 @@ class StateEstimator():
         # Encoder values
         self.encoderLeft = 0.0
         self.encoderRight = 0.0
+        self.encoderSpeed = Vector3()
         self.encoderResolution = 8192.0
 
         # wheel radius
@@ -75,7 +76,7 @@ class StateEstimator():
         self.ser = serial_read
 
         self.pub = rospy.Publisher('odometry', TwistStamped, queue_size=10)
-
+        self.motor_test = rospy.Publisher('motor_test', Vector3Stamped, queue_size = 10)
         
     def state_publisher(self):
 
@@ -113,6 +114,11 @@ class StateEstimator():
         print self.pose.vector.z
         self.pub.publish(message)
 
+        message = Vector3Stamped()
+        message.header = self.pose.header
+        message.vector = self.encoderSpeed
+        self.motor_test.publish(message)
+
 
 
     def update(self, el, er, ax, ay, gz):
@@ -139,6 +145,9 @@ class StateEstimator():
         # convert encoder diffs to nums
         vr = dr/tdiff
         vl = dl/tdiff
+
+        self.encoderSpeed.x = vl
+        self.encoderSpeed.y = vr
 
         print "wheel velocities: ", vr, vl
 
