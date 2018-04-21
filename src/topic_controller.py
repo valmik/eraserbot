@@ -14,7 +14,7 @@ class Controller():
 
         self.bot = motor_interface.Robot(1, 2)
 
-        self.odom_sub = rospy.Subscriber('/odometry', TwistStamped, self.update_state)
+        self.odom_sub = rospy.Subscriber('/odometry', TwistStamped, self.update_state, queue_size = 1)
 
         self.state = Vector3(0.0,0.0,0.0)
 
