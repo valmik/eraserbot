@@ -48,6 +48,7 @@ def motorTest(motor, logfile):
         sub.unregister()
         bot.turnOffMotors()
         print output
+        output_str = ",".join([str(x) for x in output]) + "\n"
         logfile.write(str(output))
 
     # go from 0 to 255 in multiples of 15
