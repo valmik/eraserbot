@@ -37,7 +37,7 @@ hold on
 plot(commands, speeds, 'bo')
 plot(commands, fit(coeffs), 'r-')
 xlabel('motor command')
-ylabel('observed speed')
+ylabel('observed speed, rad/s')
 title(['Motor: ', filename(18:end), ...
     ', Fit: s = ', num2str(coeffs(1)), 'c + ', num2str(coeffs(2)), ...
     ', R^2: ', num2str(R2)])

@@ -21,8 +21,14 @@ class Robot():
         # dist between wheels
         self.L = 0.205 # m
 
-        # Calibrated max speed
-        self.max_speed = 6.68 # rad/sec (very approximate)
+        # Calibrated motor functions, speed = a*command + b
+        # command = (speed - b)/a
+        self.left_a = 0.02716
+        self.left_b = -0.15537
+
+        self.right_a = 0.026793
+        self.right_b = -0.13279
+
 
         # measured minimum speed needed
         self.min_command = 20 # motor command between 0 and 255
@@ -72,12 +78,15 @@ class Robot():
         """
 
         # Find desired speed in rad/s
-        vl = ((2.0/self.R)*vd - (self.L/self.R)*wd)/2.0
-        vr = (self.L/self.R)*wd + vl
+        vl_rad = ((2.0/self.R)*vd - (self.L/self.R)*wd)/2.0
+        vr_rad = (self.L/self.R)*wd + vl_rad
 
         # Convert rad/s to motor command
-        vl = vl/self.max_speed*255
-        vr = vr/self.max_speed*255
+        # command = (speed - b)/a
+        vl = (vl_rad - self.left_b)/(self.left_a)
+        vr = (vr_rad - self.right_b)/(self.right_a)
+        # vl = vl/self.max_speed*255
+        # vr = vr/self.max_speed*255
 
         # Scale to +- 255
         if abs(vl) > 255:
@@ -96,8 +105,11 @@ class Robot():
         """
 
         # Convert command to rad/s
-        vl = vl/255*self.max_speed
-        vr = vr/255*self.max_speed
+        # speed = a*command + b
+        vl = self.left_a * vl + self.left_b
+        vr = self.right_a * vr + self.right_b
+        # vl = vl/255*self.max_speed
+        # vr = vr/255*self.max_speed
 
         w = (self.R/self.L)*(vr - vl)
         v = (self.R/2.0)*(vl + vr)
@@ -127,11 +139,25 @@ class Robot():
         print "stopping"
         self.turnOffMotors()
         
+    def test_radps(self):
+        """
+        command with angular velocities instead
+        """
 
+        l = int(raw_input("left motor value: "))
+        r = int(raw_input("right motor value: "))
+
+        l = (l - self.left_b)/(self.left_a)
+        r = (r - self.right_b)/(self.right_a)
+
+        self.set_speed(l, r)
+        rospy.sleep(3)
+        print "stopping"
+        self.turnOffMotors()
 
 
 if __name__ == '__main__':
     bot = Robot(1, 2)
     while True:
-        bot.test_speed()
+        bot.test_radps()
 
