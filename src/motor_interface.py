@@ -8,6 +8,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 import atexit
+import numpy as np
 
 class Robot():
     def __init__(self, left_id, right_id):
@@ -106,8 +107,8 @@ class Robot():
 
         # Convert command to rad/s
         # speed = a*command + b
-        vl = self.left_a * vl + self.left_b
-        vr = self.right_a * vr + self.right_b
+        vl = float(np.sign(vl))*(self.left_a * abs(vl) + self.left_b)
+        vr = float(np.sign(vr))*(self.right_a * abs(vr) + self.right_b)
         # vl = vl/255*self.max_speed
         # vr = vr/255*self.max_speed
 

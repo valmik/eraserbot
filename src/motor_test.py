@@ -52,7 +52,7 @@ def motorTest(motor, logfile):
         logfile.write(str(output))
 
     # go from 0 to 255 in multiples of 15
-    speed_range = range(0, 256, 15)
+    speed_range = range(-255, 256, 15)
 
     if motor == "left":
         for s in speed_range:
