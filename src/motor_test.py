@@ -11,7 +11,7 @@ import motor_interface
 def motorTest(motor, logfile):
 
     bot = motor_interface.Robot(1,2)
-    rate = rospy.Rate(0.1)
+    rate = rospy.Rate(5)
     
     def motorTestLeft(speed):
 
@@ -23,12 +23,13 @@ def motorTest(motor, logfile):
         bot.set_speed(speed, 0)
         sub = rospy.Subscriber('motor_test', Vector3Stamped, motorCallbackLeft)
         start_time = rospy.get_time()
-        while True:
+        while not rospy.is_shutdown():
             if len(output) > 10:
                 break
         sub.unregister()
         bot.turnOffMotors()
-        print output
+        rospy.sleep(0.5)
+        # print output
         output_str = ",".join([str(x) for x in output]) + "\n"
         logfile.write(output_str)
 
@@ -42,12 +43,13 @@ def motorTest(motor, logfile):
         bot.set_speed(0, speed)
         sub = rospy.Subscriber('motor_test', Vector3Stamped, motorCallbackRight)
         start_time = rospy.get_time()
-        while True:
+        while not rospy.is_shutdown():
             if len(output) > 10:
                 break
         sub.unregister()
         bot.turnOffMotors()
-        print output
+        rospy.sleep(0.5)
+        # print output
         output_str = ",".join([str(x) for x in output]) + "\n"
         logfile.write(str(output))
 
