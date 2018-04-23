@@ -72,7 +72,7 @@ if __name__ == '__main__':
         print "Argument should be 'left' or 'right'"
         sys.exit()
     now = datetime.datetime.now()
-    filename = "../logs/" + now.strftime("%Y-%m-%d-%H-%M") + " " + motor
+    filename = "../logs/" + now.strftime("%Y-%m-%d-%H-%M") + "_" + motor
     logfile = open(filename, 'w+')
 
     rospy.init_node('motor_testing', anonymous=True)

@@ -145,13 +145,13 @@ class Robot():
         command with angular velocities instead
         """
 
-        l = int(raw_input("left motor value: "))
-        r = int(raw_input("right motor value: "))
+        l = float(raw_input("left motor speed: "))
+        r = float(raw_input("right motor speed: "))
 
         l = (l - self.left_b)/(self.left_a)
         r = (r - self.right_b)/(self.right_a)
 
-        self.set_speed(l, r)
+        self.set_speed(int(l), int(r))
         rospy.sleep(3)
         print "stopping"
         self.turnOffMotors()
