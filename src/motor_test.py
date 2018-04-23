@@ -51,7 +51,7 @@ def motorTest(motor, logfile):
         rospy.sleep(0.5)
         # print output
         output_str = ",".join([str(x) for x in output]) + "\n"
-        logfile.write(str(output))
+        logfile.write(output_str)
 
     # go from 0 to 255 in multiples of 15
     speed_range = range(-255, 256, 15)

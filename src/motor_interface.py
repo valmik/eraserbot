@@ -24,11 +24,11 @@ class Robot():
 
         # Calibrated motor functions, speed = a*command + b
         # command = (speed - b)/a
-        self.left_a = 0.02716
-        self.left_b = -0.15537
+        self.left_a = 0.0260
+        self.left_b = 0.0007
 
-        self.right_a = 0.026793
-        self.right_b = -0.13279
+        self.right_a = 0.0258
+        self.right_b = 0.0007
 
 
         # measured minimum speed needed
