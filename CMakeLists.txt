@@ -62,6 +62,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   ImageSrv.srv
+  StateSrv.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -75,6 +76,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   sensor_msgs
+  geometry_msgs
 )
 
 ################################################

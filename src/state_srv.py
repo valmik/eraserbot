@@ -1,44 +1,46 @@
 #!/usr/bin/env python
 import rospy
 
-from sensor_msgs.msg import Image
-from eraserbot.srv import ImageSrv, ImageSrvResponse
+from geometry_msgs.msg import Vector3, TwistStamped
+from eraserbot.srv import StateSrv, StateSrvResponse
 
 
-class ImgService:
+class StateService:
   #Callback for when an image is received
-  def imgReceived(self, message):
+  def stateReceived(self, message):
     #Save the image in the instance variable
-    self.lastImage = message
+    self.state.x = message.twist.linear.x
+    self.state.y = message.twist.linear.y
+    self.state.z = message.twist.angular.z
 
     #Print an alert to the console
     #print(rospy.get_name() + ":Image received!")
 
   #When another node calls the service, return the last image
-  def getLastImage(self, request):
+  def getState(self, request):
     #Print an alert to the console
     #print("Image requested!")
 
     #Return the last image
-    return ImageSrvResponse(self.lastImage)
+    return StateSrvResponse(self.state)
 
   def __init__(self):
     #Create an instance variable to store the last image received
-    self.lastImage = None;
+    self.state = Vector3();
 
     #Initialize the node
-    rospy.init_node('cam_listener')
+    rospy.init_node('state_listener')
 
     #Subscribe to the image topic
-    rospy.Subscriber("/usb_cam/image_raw", Image, self.imgReceived)
+    rospy.Subscriber("/odometry", TwistStamped, self.stateReceived)
 
     #Create the service
-    rospy.Service('last_image', ImageSrv, self.getLastImage)
+    rospy.Service('current_state', StateSrv, self.getState)
 
   def run(self):
     rospy.spin()
 
 #Python's syntax for a main() method
 if __name__ == '__main__':
-  node = ImgService()
+  node = StateService()
   node.run()

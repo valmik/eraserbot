@@ -1,0 +1,4 @@
+# An empty request
+---
+# The state of the robot in a Vector3, (x,y,theta)
+geometry_msgs/Vector3 state
