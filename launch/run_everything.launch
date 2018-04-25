@@ -3,7 +3,7 @@
     <node pkg="eraserbot" type="observer.py" name="observer" respawn="false"/>
 
     <!-- Camera Node --> 
-    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" >
         <param name="video_device" value="/dev/video0" />
 
         <!-- Parameters for the Logitech C920 Camera -->
@@ -25,9 +25,7 @@
     -->
 
     <!-- Camera service -->
-    <!--
     <node name="camera_srv" pkg="eraserbot" type="camera_srv.py"  respawn="false" output="screen" />
-    -->
 
     <!-- Image Processing -->
     <!--
@@ -35,8 +33,7 @@
     -->
 
     <!-- State Service -->
-    <!-- 
     <node name="state_srv" pkg="eraserbot" type="state_srv.py" respawn="false" output="screen" />
-    -->
+    
 
 </launch>
