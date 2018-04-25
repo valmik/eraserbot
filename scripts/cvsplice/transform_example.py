@@ -9,6 +9,9 @@
 # python transform_example.py --image images/example_02.png --coords "[(101, 185), (393, 151), (479, 323), (187, 441)]"
 # python transform_example.py --image images/example_03.png --coords "[(63, 242), (291, 110), (361, 252), (78, 386)]"
 # python transform_example.py --image images/calibration_01.png --coords "[(133, 938), (603, 206), (1339, 216), (1841, 946)]"
+# python transform_example.py --image images/splice_calibration.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "calibration_warped.png"
+# python transform_example.py --image images/splice1.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "splice1_warped.png"
+# python transform_example.py --image images/splice2.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "splice2_warped.png"
 
 
 # import the necessary packages
@@ -22,7 +25,10 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", help = "path to the image file")
 ap.add_argument("-c", "--coords",
     help = "comma seperated list of source points")
+ap.add_argument( "-n", "--name", help = "name to save the new file")
 args = vars(ap.parse_args())
+
+print args
 
 # load the image and grab the source coordinates (i.e. the list of
 # of (x, y) points)
@@ -41,11 +47,14 @@ warped = four_point_transform(image, pts, size)
 # resize
 dim = (warped.shape[0]/3, warped.shape[1]/3)
 warped = cv2.resize(warped, dim, interpolation = cv2.INTER_AREA)
-path = args["image"]
-path_list = path.split('/')
-path_list[-1] = "testwarp.png"
-new_path = '/'.join(path_list)
-cv2.imwrite(new_path, warped)
+
+print args.get("name")
+if not (args.get("name") == None):
+    path = args["image"]
+    path_list = path.split('/')
+    path_list[-1] = args.get("name")
+    new_path = '/'.join(path_list)
+    cv2.imwrite(new_path, warped)
 
 # show the original and warped images
 # Note: These two don't work on the Pi for some reason, but that's fine there are no errors
