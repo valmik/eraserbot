@@ -6,7 +6,9 @@ import rospy
 import topic_controller
 import math
 import time
+import datetime
 import cv2
+import os
 import numpy as np
 from geometry_msgs.msg import TwistStamped, Vector3
 from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
@@ -29,6 +31,14 @@ image_service =  rospy.ServiceProxy('last_image', ImageSrv)
 
 bridge = CvBridge()
 
+now = datetime.datetime.now()
+directory = "../images/" + now.strftime("%Y-%m-%d-%H-%M") + "/"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+filename = directory + "states"
+logfile = open(filename, 'w+')
+
 xi = state_service().state.x
 yi = state_service().state.y
 ti = state_service().state.z
@@ -37,10 +47,14 @@ count = 0; # counter for pictures taken so it can save them with different names
 
 def take_image(c):
     print "taking image"
+    state = state_service().state
     pic = image_service().image_data
     np_pic = np.array(bridge.imgmsg_to_cv2(pic, 'bgr8'))
-    path = "../images/" + str(count) + ".png"
+    path = directory + str(c) + ".png"
     cv2.imwrite(path, np_pic)
+    output = [c, state.x, state.y, state.z]
+    output_str = ",".join([str(x) for x in output]) + "\n"
+    logfile.write(output_str)
     return c+1
 
 while (state_service().state.x < boardSizeX): # sweeping left to right until x-coord is past the scanning area
@@ -93,8 +107,8 @@ while (state_service().state.x < boardSizeX): # sweeping left to right until x-c
         print("\n")
         # time.sleep(2)
 
+logfile.close()
 print("Done scanning board!")
-
 
 
 
