@@ -4,6 +4,7 @@ import rospy
 from geometry_msgs.msg import TwistStamped, Vector3
 
 import math
+import time
 import numpy as np
 import motor_interface
 
@@ -24,6 +25,7 @@ class Controller():
 
         self.previous = Vector3(0.0, 0.0, 0.0)
 
+
     def update_state(self, msg):
         self.state.x = msg.twist.linear.x
         self.state.y = msg.twist.linear.y
@@ -32,7 +34,8 @@ class Controller():
         
     def move_to_pose(self, desired_pose):
         """
-        Pose is a Vector3 containing desired x,y,theta
+        desired_pose: a Vector3 containing desired x,y,theta
+        THIS FUNCTION DOES NOT WORK CORRECTLY
         """
 
         while not rospy.is_shutdown():
@@ -62,7 +65,6 @@ class Controller():
             self.bot.set_speed(int(l), int(r))
 
 
-
     def control(self, desired_pose, current_pose, vr, wr):
         """
         Contains the actual controller
@@ -88,6 +90,47 @@ class Controller():
         print ex, ey, vd, wd
 
         return vd, wd
+
+
+    def move_straight(self, dist):
+        """
+        dist: Desired distance in meters
+        Moves [dist] meters forwards/backwards in a straight line
+        Open loop function
+        """
+
+        mvel = 200 # speed that wheel will move
+        vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
+        t = dist/vel[0] # travel time
+	if (dist < 0): # correct for negative values
+            t = -1*t
+            mvel = -1*mvel
+
+        self.bot.set_speed(mvel,mvel) # drive
+        time.sleep(t) # keep driving until distance should be reached
+        self.bot.turnOffMotors() # stop driving
+
+
+    def tank_pivot(self, theta):
+        """
+        theta: Desired angle in radians
+        Pivots [theta] radians counterclockwise/clockwise around the center of the wheels
+        Open loop function
+        """
+
+        dw = 0.2175 # width of wheel base in meters
+        mvel = 100 # speed that wheel will move
+        
+        dist = dw/2*theta # arc length that wheels should move
+        vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
+        t = dist/vel[0] # travel time
+	if (theta < 0): # correct for negative values
+            t = -1*t
+            mvel = -1*mvel
+
+        self.bot.set_speed(-1*mvel, mvel) # pivot about center of wheels
+        time.sleep(t) # keep turning until angle should be reached
+        self.bot.turnOffMotors() # stop turning
 
 
 def main():
