@@ -1,3 +1,3 @@
-image = imread('images/splice_calibration.png');
+image = imread('images/calibration.png');
 imshow(image)
 [x,y] = ginput(4)
