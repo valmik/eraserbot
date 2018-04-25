@@ -22,4 +22,14 @@
     </node>
     -->
 
+    <!-- Camera service -->
+    <!--
+    <node name="camera_srv" pkg="eraserbot" type="camera_srv.py"  respawn="false" output="screen" />
+    -->
+
+    <!-- Image Processing -->
+    <!--
+    <node name="image_process" pkg="lab4_cam" type="image_process.py"  respawn="false" output="screen" />
+    -->
+
 </launch>
