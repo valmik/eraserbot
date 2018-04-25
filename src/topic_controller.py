@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import rospy
-from geometry_msgs.msg import TwistStamped, Vector3
-from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
-
 import math
-import time
-import numpy as np
 import motor_interface
+import numpy as np
+import rospy
+import time
+from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
+from geometry_msgs.msg import TwistStamped, Vector3
+
 
 class Controller():
     def __init__(self):
@@ -15,7 +15,6 @@ class Controller():
         self.bot = motor_interface.Robot(1, 2)
         rospy.wait_for_service('current_state')
         self.state_service = rospy.ServiceProxy('current_state', StateSrv)
-
 
 
 #    def open_move_straight(self, dist):
@@ -68,7 +67,6 @@ class Controller():
         print("done moving")
 
 
-
 #    def open_tank_pivot(self, theta):
  #       # theta: Desired anglular change in radians
   #      # Pivots [theta] radians counterclockwise/clockwise around the center of the wheels
@@ -89,12 +87,11 @@ class Controller():
     #    self.bot.turnOffMotors() # stop turning
 
 
-
     def closed_tank_pivot(self, theta):
         # theta: Desired angle position in radians
         # Rotates until 
         # Closed loop function
-        # THIS WORKS DIFFERENTLY THAN open_tank_pivot
+        # THIS TAKES DIFFERENT INPUTS THAN open_tank_pivot
         
         # initialize these things
         t = self.state_service().state.z # x position to be updated

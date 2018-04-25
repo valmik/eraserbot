@@ -17,16 +17,12 @@ from sensor_msgs.msg import Image
 from transform import four_point_transform
 
 # Board size
-boardWidth = 1.0 # width in meters
-boardHeight = 1.3 # height in meters
+boardSizeX = 0.75 # width
+boardSizeY = 0.5 # height
 
 # Image size
-imageWidth = 0.21 # width in meters - 75% of paper
-imageHeight = 0.17 # height in meters - 75% of paper
-
-# Robot dimensions
-robotWidth = 0.3 # width in meters
-robotReach = 0.25 # distance from wheel base that can be scanned
+imageSizeX = 0.23 # width
+imageSizeY = 0.23 # height
 
 # Points for 4-pt homography, from calibration
 points = np.array([(331.0, 98.0), (1493.0, 62.0), (1721.0, 982.0), (181.0, 1058.0)], dtype = "float32")
@@ -70,53 +66,56 @@ def take_image(count):
 
 
 # START OF SCRIPT
-# ROBOT SHOULD BE BELOW THE BOTTOM-LEFT CORNER OF THE SCANNING AREA, FACING UPWARDS
 
-eraserbot.closed_tank_pivot(0.0*math.pi) # correct angle
-while (-1*state_service().state.y < boardWidth): # sweeping left to right until past the scanning area
+eraserbot.closed_tank_pivot(0.5*math.pi) # correct angle
+while (state_service().state.x < boardSizeX): # sweeping left to right until x-coord is past the scanning area
     if (d > 0): # if the direction is up
-        while (state_service().state.x + robotReach < boardHeight + robotReach): # while the scanning area has not reached the top of the board
-            rospy.sleep(0.5)
+        while (state_service().state.y < boardSizeY): # while below the top of the board
             imageCount = take_image(imageCount) # take a picture
+            # time.sleep(0.5)
 
             print("Moving up")
-            eraserbot.closed_tank_pivot(0.0*math.pi) # correct angle
-            eraserbot.closed_move_straight(imageHeight) # move up one image height
+            eraserbot.closed_tank_pivot(0.5*math.pi) # correct angle
+            eraserbot.closed_move_straight(imageSizeY) # move up one image height
             print(state_service().state)
+            # time.sleep(2)
 
         # this is run after reaching the top of the board
         print("Turning right")
-        eraserbot.closed_tank_pivot(0.0*math.pi) # correct angle
-        eraserbot.closed_move_straight(2*robotReach) # move the wheels past the board
-        eraserbot.closed_tank_pivot(1.5*math.pi) # turn to face right
-        eraserbot.closed_move_straight(imageWidth) # move over one image width
-        eraserbot.closed_tank_pivot(1.0*math.pi) # turn to face down
+        eraserbot.closed_tank_pivot(0.5*math.pi) # correct angle
+        eraserbot.closed_move_straight(imageSizeY) # move past the board one image height
+        eraserbot.closed_tank_pivot(0.0*math.pi) # turn to face right
+        eraserbot.closed_move_straight(imageSizeX) # move over one image width
+        eraserbot.closed_tank_pivot(1.5*math.pi) # turn to face down
 
         d = -1 # set direction to down
         print(state_service().state)
-        print("\n")
+        ("\n")
+        # time.sleep(2)
 
     else: # if the direction is down
-        while (state_service().state.x - robotReach > robotReach): # while above the bottom of the board
-            rospy.sleep(0.5)
+        while (state_service().state.y > 0): # while above the bottom of the board
             imageCount = take_image(imageCount) # take a picture
+            # time.sleep(0.5)
 
             print("Moving down")
-            eraserbot.closed_tank_pivot(1.0*math.pi) # correct angle
-            eraserbot.closed_move_straight(imageHeight) # move down one image height
+            eraserbot.closed_tank_pivot(1.5*math.pi) # correct angle
+            eraserbot.closed_move_straight(imageSizeY) # move down one image height
             print(state_service().state)
+            # time.sleep(2)
 
         # this is run after reaching the bottom of the board
         print("Turning left")
-        eraserbot.closed_tank_pivot(1.0*math.pi) # correct angle
-        eraserbot.closed_move_straight(2*robotReach) # move past the board one image height
-        eraserbot.closed_tank_pivot(1.5*math.pi) # turn to face right
-        eraserbot.closed_move_straight(imageWidth) # move over one image width
-        eraserbot.closed_tank_pivot(0.0*math.pi) # turn to face up
+        eraserbot.closed_tank_pivot(1.5*math.pi) # correct angle
+        eraserbot.closed_move_straight(imageSizeY) # move past the board one image height
+        eraserbot.closed_tank_pivot(0.0*math.pi) # turn to face right
+        eraserbot.closed_move_straight(imageSizeX) # move over one image width
+        eraserbot.closed_tank_pivot(0.5*math.pi) # turn to face up
 
         d = 1 # set direction to up
         print(state_service().state)
         print("\n")
+        # time.sleep(2)
 
 logfile.close() # stop writing to the state file
 print("Done scanning board!")

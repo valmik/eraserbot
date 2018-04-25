@@ -71,7 +71,7 @@ class StateEstimator():
         # wheel radius
         self.R = 0.056 # m
         # dist between wheels
-        self.L = 0.205 # m
+        self.L = 0.205*1.16 # m
 
         self.ser = serial_read
 
