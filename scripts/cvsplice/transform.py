@@ -3,6 +3,8 @@
 import numpy as np
 import cv2
 
+
+
 def order_points(pts):
     # initialzie a list of coordinates that will be ordered
     # such that the first entry in the list is the top-left,
@@ -24,14 +26,26 @@ def order_points(pts):
     rect[3] = pts[np.argmax(diff)]
 
     # return the ordered coordinates
-    return rect
+    return pts
 
 
-def four_point_transform(image, pts):
+def four_point_transform(image, pts, size):
+    """
+    Do a 4-point homography transformation (with scaling)
+
+    image: opencv image
+    pts: tuple of (x,y) points (in pixels) of the top left, top right, 
+        bottom right, bottom left corners IN THAT ORDER
+    real: tuple of (width, length)
+
+    """
+
     # obtain a consistent order of the points and unpack them
     # individually
     rect = order_points(pts)
-    (tl, tr, br, bl) = rect
+    (tl, tr, br, bl) = rect # 100 pixels per inch
+
+    print tl, tr, br, bl
 
     # compute the width of the new image, which will be the
     # maximum distance between bottom-right and bottom-left
@@ -39,6 +53,7 @@ def four_point_transform(image, pts):
     widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
     widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
     maxWidth = max(int(widthA), int(widthB))
+    print "maxWidth", maxWidth
 
     # compute the height of the new image, which will be the
     # maximum distance between the top-right and bottom-right
@@ -46,6 +61,10 @@ def four_point_transform(image, pts):
     heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
     maxHeight = max(int(heightA), int(heightB))
+    print "maxHeight", maxHeight
+
+
+
 
     # now that we have the dimensions of the new image, construct
     # the set of destination points to obtain a "birds eye view",
@@ -61,6 +80,9 @@ def four_point_transform(image, pts):
     # compute the perspective transform matrix and then apply it
     M = cv2.getPerspectiveTransform(rect, dst)
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+    dim = (int(size[0] * 200), int(size[1]*200))
+    print dim
+    warped = cv2.resize(warped, dim, interpolation = cv2.INTER_AREA)
 
     # return the warped image
     return warped

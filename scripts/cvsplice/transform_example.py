@@ -1,5 +1,9 @@
 # Taken and lightly modified from pyimagesearch.com
 
+# Useful links
+# https://www.pyimagesearch.com/2014/01/20/basic-image-manipulations-in-python-and-opencv-resizing-scaling-rotating-and-cropping/
+
+
 # USAGE
 # python transform_example.py --image images/example_01.png --coords "[(73, 239), (356, 117), (475, 265), (187, 443)]"
 # python transform_example.py --image images/example_02.png --coords "[(101, 185), (393, 151), (479, 323), (187, 441)]"
@@ -27,10 +31,21 @@ args = vars(ap.parse_args())
 # automatically determine the coordinates without pre-supplying them
 image = cv2.imread(args["image"])
 pts = np.array(eval(args["coords"]), dtype = "float32")
+# real = np.array([(0, 0), (11.0, 0), (11.0, 8.5), (0, 8.5)])
+size = (8.5, 11.0)
 
 # apply the four point tranform to obtain a "birds eye view" of
 # the image
-warped = four_point_transform(image, pts)
+warped = four_point_transform(image, pts, size)
+
+# resize
+dim = (warped.shape[0]/3, warped.shape[1]/3)
+warped = cv2.resize(warped, dim, interpolation = cv2.INTER_AREA)
+path = args["image"]
+path_list = path.split('/')
+path_list[-1] = "testwarp.png"
+new_path = '/'.join(path_list)
+cv2.imwrite(new_path, warped)
 
 # show the original and warped images
 # Note: These two don't work on the Pi for some reason, but that's fine there are no errors
