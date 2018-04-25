@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
+# http://wiki.ros.org/rospy/Overview/Time
+
+import rospy
 import topic_controller
 import math
 import time
+from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
+from cv_bridge import CvBridge, CvBridgeError
 
 
 boardSizeX = 0.75 # width of the scannable board in meters
@@ -12,6 +17,13 @@ imageSizeY = 0.23 # height of scanning area
 
 eraserbot = topic_controller.Controller()
 coordinates = [0,0,1]  # x in meters, y in meters, direction in [1,-1] for up/down
+
+
+rospy.wait_for_service('current_state')
+state_service = rospy.ServiceProxy('current_state', StateSrv)
+
+current_state = state_service().state
+
 
 while (coordinates[0] < boardSizeX): # sweeping left to right until x-coord is past the scanning area
     if (coordinates[2] > 0): # if the direction is down

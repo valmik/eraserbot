@@ -102,7 +102,7 @@ class Controller():
         mvel = 200 # speed that wheel will move
         vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
         t = dist/vel[0] # travel time
-	if (dist < 0): # correct for negative values
+        if (dist < 0): # correct for negative values
             t = -1*t
             mvel = -1*mvel
 
@@ -124,7 +124,7 @@ class Controller():
         dist = dw/2*theta # arc length that wheels should move
         vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
         t = dist/vel[0] # travel time
-	if (theta < 0): # correct for negative values
+        if (theta < 0): # correct for negative values
             t = -1*t
             mvel = -1*mvel
 
