@@ -23,8 +23,8 @@ imageSizeX = 0.23 # width of scanning area
 imageSizeY = 0.23 # height of scanning area
 
 # Points for the 4-pt homography, from calibration
-pts = np.array([(331, 98), (1493, 62), (1721, 982), (181, 1058)])
-size = (8.5, 11.0)
+pts = np.array([(331.0, 98.0), (1493.0, 62.0), (1721.0, 982.0), (181.0, 1058.0)], dtype = "float32")
+size = (11.0, 8.5)
 
 eraserbot = topic_controller.Controller()
 # coordinates = [0,0,1]  # x in meters, y in meters, direction in [1,-1] for up/down
@@ -54,8 +54,8 @@ def take_image(c):
     print "taking image"
     state = state_service().state
     pic = image_service().image_data
-    np_pic = np.array(bridge.imgmsg_to_cv2(pic, 'bgr8'))
-    warped = four_point_transform(np_pic, pts, size)
+    cv_pic = bridge.imgmsg_to_cv2(pic, 'bgr8')
+    warped = four_point_transform(cv_pic, pts, size)
     path = directory + str(c) + ".png"
     cv2.imwrite(path, warped)
     output = [c, state.x, state.y, state.z]

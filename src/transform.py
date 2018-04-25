@@ -13,7 +13,6 @@ def four_point_transform(image, pts, size):
     size: tuple of (width, length)
 
     """
-
     # obtain a consistent order of the points and unpack them
     # individually
     rect = pts
