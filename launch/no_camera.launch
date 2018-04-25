@@ -1,0 +1,9 @@
+<launch>
+    <!-- Observer Node-->
+    <node pkg="eraserbot" type="observer.py" name="observer" respawn="false"/>
+
+    <!-- State Service -->
+    <node name="state_srv" pkg="eraserbot" type="state_srv.py" respawn="false" output="screen" />
+    
+
+</launch>

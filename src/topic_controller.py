@@ -2,6 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import TwistStamped, Vector3
+from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
 
 import math
 import time
@@ -9,138 +10,133 @@ import numpy as np
 import motor_interface
 
 class Controller():
-    """docstring for Controller"""
     def __init__(self):
-        rospy.init_node("Controller")
-
+        #rospy.init_node("Controller")
         self.bot = motor_interface.Robot(1, 2)
-
-        self.odom_sub = rospy.Subscriber('/odometry', TwistStamped, self.update_state, queue_size = 1)
-
-        self.state = Vector3(0.0,0.0,0.0)
-
-        self.k1 = 0.5
-        self.k2 = 1.0
-        self.k3 = 1.0
-
-        self.previous = Vector3(0.0, 0.0, 0.0)
+        rospy.wait_for_service('current_state')
+        self.state_service = rospy.ServiceProxy('current_state', StateSrv)
 
 
-    def update_state(self, msg):
-        self.state.x = msg.twist.linear.x
-        self.state.y = msg.twist.linear.y
-        self.state.z = msg.twist.angular.z
 
+#    def open_move_straight(self, dist):
+        # dist: Desired distance in meters
+        # Moves [dist] meters forwards/backwards in a straight line
+        # Open loop function
+
+#        mvel = 200 # speed that wheel will move
+  #      vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
+  #      t = dist/vel[0] # travel time
+   #     if (dist < 0): # correct for negative values
+   #         t = -1*t
+   #         mvel = -1*mvel
+
+#        self.bot.set_speed(mvel,mvel) # drive
+  #      time.sleep(t) # keep driving until distance should be reached
+    #    self.bot.turnOffMotors() # stop driving
+
+
+    def closed_move_straight(self, dist):
+        # dist: Desired distance in meters
+        # Moves [dist] meters forwards/backwards in a straight line
+        # Closed loop function
+
+        xi = self.state_service().state.x # get the original x position
+        yi = self.state_service().state.y # get the original y position
+
+        # initialize these things
+        x = xi # x position to be updated
+        y = yi # y position to be updated
+        travel = 0 # distance traveled from original position
+        mvel = 150 # motor speed
         
-    def move_to_pose(self, desired_pose):
-        """
-        desired_pose: a Vector3 containing desired x,y,theta
-        THIS FUNCTION DOES NOT WORK CORRECTLY
-        """
+        while (abs(travel - dist) > 0.01): # while distance is >1 cm from the desired distance
+            if (abs(travel - dist) < 0.05): # slow down when <5 cm away
+                mvel = 75
+            
+            if (travel < dist):
+                self.bot.set_speed(mvel, mvel) # assumes will drive in straight line
+            else:
+                self.bot.set_speed(-1*mvel,-1*mvel) # drive backwards for negative distances
 
-        while not rospy.is_shutdown():
-            current_pose = self.state
-            x = current_pose.x
-            y = current_pose.y
-            t = current_pose.z
+            # get updated position and travel distance
+            x = self.state_service().state.x
+            y = self.state_service().state.y
+            travel = math.sqrt((x - xi)**2 + (y - yi)**2)
+            print(travel)
 
-            xr = desired_pose.x
-            yr = desired_pose.y
-            tr = desired_pose.z
-
-            ep = (math.sqrt((xr - x)**2 + (yr - y)**2))
-            et = (tr - t)
-
-            if ep < 0.01 and et < 0.1:
-                return
-
-            vri = ep/0.1
-            wri = et/0.1
-
-            vr, wr = self.bot.scale_velocity(vri, wri)
-
-            vd, wd = self.control(desired_pose, current_pose, vr, wr)
-
-            l, r = self.bot.vw_to_lr(vd, wd)
-            self.bot.set_speed(int(l), int(r))
+        self.bot.turnOffMotors() # when reached distance, stop moving
+        print("done moving")
 
 
-    def control(self, desired_pose, current_pose, vr, wr):
-        """
-        Contains the actual controller
-        """
 
-        x = current_pose.x
-        y = current_pose.y
-        t = current_pose.z
+#    def open_tank_pivot(self, theta):
+ #       # theta: Desired anglular change in radians
+  #      # Pivots [theta] radians counterclockwise/clockwise around the center of the wheels
+        # Open loop function
 
-        xr = desired_pose.x
-        yr = desired_pose.y
-        tr = desired_pose.z
-
-        ex = (math.cos(t) - math.sin(t))*(xr - x)
-        ey = (math.sin(t) + math.cos(t))*(yr - y)
-
-        u1 = -self.k1*ex
-        u2 = self.k2*vr*np.sinc(tr - t)*ey - self.k3*(tr - t)
-
-        vd = math.cos(tr - t)*vr - u1
-        wd = wr - u2
-
-        print ex, ey, vd, wd
-
-        return vd, wd
-
-
-    def move_straight(self, dist):
-        """
-        dist: Desired distance in meters
-        Moves [dist] meters forwards/backwards in a straight line
-        Open loop function
-        """
-
-        mvel = 200 # speed that wheel will move
-        vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
-        t = dist/vel[0] # travel time
-        if (dist < 0): # correct for negative values
-            t = -1*t
-            mvel = -1*mvel
-
-        self.bot.set_speed(mvel,mvel) # drive
-        time.sleep(t) # keep driving until distance should be reached
-        self.bot.turnOffMotors() # stop driving
-
-
-    def tank_pivot(self, theta):
-        """
-        theta: Desired angle in radians
-        Pivots [theta] radians counterclockwise/clockwise around the center of the wheels
-        Open loop function
-        """
-
-        dw = 0.2175 # width of wheel base in meters
-        mvel = 100 # speed that wheel will move
+    #    dw = 0.2175 # width of wheel base in meters
+      #  mvel = 100 # speed that wheel will move
         
-        dist = dw/2*theta # arc length that wheels should move
-        vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
-        t = dist/vel[0] # travel time
-        if (theta < 0): # correct for negative values
-            t = -1*t
-            mvel = -1*mvel
+ #       dist = dw/2*theta # arc length that wheels should move
+   #     vel = self.bot.lr_to_vw(mvel, mvel) # find the equivalent speed in m/s
+     #   t = dist/vel[0] # travel time
+    #    if (theta < 0): # correct for negative values
+    #        t = -1*t
+      #      mvel = -1*mvel
 
-        self.bot.set_speed(-1*mvel, mvel) # pivot about center of wheels
-        time.sleep(t) # keep turning until angle should be reached
-        self.bot.turnOffMotors() # stop turning
-
-
-def main():
-
-    control = Controller()
-    desired_pose = Vector3(1.0, 0, 0)
-    control.move_to_pose(desired_pose)
+#        self.bot.set_speed(-1*mvel, mvel) # pivot about center of wheels
+  #      time.sleep(t) # keep turning until angle should be reached
+    #    self.bot.turnOffMotors() # stop turning
 
 
-if __name__ == '__main__':
-    main()
+
+    def closed_tank_pivot(self, theta):
+        # theta: Desired angle position in radians
+        # Rotates until 
+        # Closed loop function
+        # THIS WORKS DIFFERENTLY THAN open_tank_pivot
+        
+        # initialize these things
+        t = self.state_service().state.z # x position to be updated
+        dist = (t - theta) % (2*math.pi) # angular offset, positive is too far counterclockwise
+        
+        mvel = 100 # motor speed
+
+        while (abs(dist) > 0.04): # while >0.01 rad from desired angular position
+            if (abs(dist) < 0.5): # slow down when <0.5 rad away
+                mvel = 50
+
+            if (dist > 0): # if too far counterclockwise
+                self.bot.set_speed(mvel, -1*mvel) # turn clockwise
+            else: # if too far clockwise
+                self.bot.set_speed(-1*mvel, mvel) # turn counterclockwise
+
+            t = self.state_service().state.z # get updated position
+            dist = ((t - theta + math.pi) % (2*math.pi)) - math.pi # recalculate angular offset
+            print(self.state_service().state.z)
+        
+        self.bot.turnOffMotors() # when reached distance, stop moving
+
+
+#    def go_home(self):
+ #       # DOESN'T WORK
+ #       
+   #     x = self.state_service().state.x
+   #     y = self.state_service().state.y
+     #   dist = math.sqrt(x**2 + y**2)
+        
+    #    while (abs(dist) > 0.01):
+      #      self.closed_tank_pivot(0.5*math.pi - np.arctan(x / y))
+        #    self.closed_move_straight(dist)
+            
+          #  x = self.state_service().state.x
+   #         y = self.state_service().state.y
+     #       dist = math.sqrt(x**2 + y**2)
+       #     print(self.state_service().state)
+         #   time.sleep(5)
+        
+        #self.closed_tank_pivot(0)
+
+
 
 
