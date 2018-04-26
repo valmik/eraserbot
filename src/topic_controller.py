@@ -46,11 +46,11 @@ class Controller():
         x = xi # x position to be updated
         y = yi # y position to be updated
         travel = 0 # distance traveled from original position
-        mvel = 150 # motor speed
+        mvel = 220 # motor speed
         
         while (abs(travel - dist) > 0.01): # while distance is >1 cm from the desired distance
             if (abs(travel - dist) < 0.05): # slow down when <5 cm away
-                mvel = 75
+                mvel = 110
             
             if (travel < dist):
                 self.bot.set_speed(mvel, mvel) # assumes will drive in straight line
@@ -97,11 +97,11 @@ class Controller():
         t = self.state_service().state.z # x position to be updated
         dist = (t - theta) % (2*math.pi) # angular offset, positive is too far counterclockwise
         
-        mvel = 100 # motor speed
+        mvel = 200 # motor speed
 
         while (abs(dist) > 0.04): # while >0.01 rad from desired angular position
             if (abs(dist) < 0.5): # slow down when <0.5 rad away
-                mvel = 50
+                mvel = 80
 
             if (dist > 0): # if too far counterclockwise
                 self.bot.set_speed(mvel, -1*mvel) # turn clockwise
