@@ -20,7 +20,7 @@ class Robot():
         # wheel radius
         self.R = 0.056 # m
         # dist between wheels
-        self.L = 0.205 # m
+        self.L = 0.220 # m
 
         # Calibrated motor functions, speed = a*command + b
         # command = (speed - b)/a
