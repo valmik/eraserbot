@@ -102,6 +102,27 @@ class Stitcher():
  
         # otherwise, no homograpy could be computed
         return None
+
+    def drawMatches(self, imageA, imageB, kpsA, kpsB, matches, status):
+        # initialize the output visualization image
+        (hA, wA) = imageA.shape[:2]
+        (hB, wB) = imageB.shape[:2]
+        vis = np.zeros((max(hA, hB), wA + wB, 3), dtype="uint8")
+        vis[0:hA, 0:wA] = imageA
+        vis[0:hB, wA:] = imageB
+ 
+        # loop over the matches
+        for ((trainIdx, queryIdx), s) in zip(matches, status):
+            # only process the match if the keypoint was successfully
+            # matched
+            if s == 1:
+                # draw the match
+                ptA = (int(kpsA[queryIdx][0]), int(kpsA[queryIdx][1]))
+                ptB = (int(kpsB[trainIdx][0]) + wA, int(kpsB[trainIdx][1]))
+                cv2.line(vis, ptA, ptB, (0, 255, 0), 1)
+ 
+        # return the visualization
+        return vis
         
 
 

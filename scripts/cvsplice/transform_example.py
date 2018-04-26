@@ -12,6 +12,7 @@
 # python transform_example.py --image images/splice_calibration.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "calibration_warped.png"
 # python transform_example.py --image images/splice1.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "splice1_warped.png"
 # python transform_example.py --image images/splice2.png --coords "[(207, 120), (599, 126), (709, 396), (141, 394)]" --name "splice2_warped.png"
+# python transform_example.py --image images/calibration.png --coords "[(331, 98), (1493, 62), (1721, 982), (181, 1058)]"
 
 
 # import the necessary packages

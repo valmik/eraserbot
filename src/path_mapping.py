@@ -29,7 +29,7 @@ robotWidth = 0.3 # width in meters
 robotReach = 0.25 # distance from wheel base that can be scanned
 
 # Points for 4-pt homography, from calibration
-points = np.array([(331.0, 98.0), (1493.0, 62.0), (1721.0, 982.0), (181.0, 1058.0)], dtype = "float32")
+points = np.array([(381.0, 100.0), (1537.0, 96.0), (1781.0, 1030.0), (97.0, 1010.0)], dtype = "float32")
 pointSize = (11.0, 8.5)
 
 # Initialize stuff
