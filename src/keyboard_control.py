@@ -23,7 +23,7 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-button_delay = 0.2
+button_delay = 1
 
 bot = motor_interface.Robot(1,2)
 
