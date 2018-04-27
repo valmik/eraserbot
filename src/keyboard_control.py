@@ -17,7 +17,8 @@ def getch():
     try:
         ttw.setraws(sys.stdin.fileno())
         ch = sys.stdin.read(1)
-
+    except:
+        ch = 'p'
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
@@ -26,7 +27,7 @@ button_delay = 0.2
 
 bot = motor_interface.Robot(1,2)
 
-node = rospy.init_node("Keyboard Control")
+node = rospy.init_node("KeyboardControl")
 
 while not rospy.is_shutdown():
     char = getch()
