@@ -85,6 +85,28 @@ def take_image(count):
 # START OF SCRIPT
 # ROBOT SHOULD BE AT THE BOTTOM-LEFT CORNER OF THE SCANNING AREA, FACING UPWARDS
 
+while (state_service().state.x + robotBack + robotReach < boardHeight - imageHeight): # while the scanning area has not reached the top of the board
+    rospy.sleep(1.0)
+    imageCount = take_image(imageCount) # take a picture
+
+    print("Moving up")
+    #eraserbot.closed_tank_pivot(directionUp, upSpeed) # correct angle
+    eraserbot.closed_move_straight(imageHeight, upSpeed) # move up one image height
+    print(state_service().state)
+print("Turning right")
+eraserbot.closed_move_straight(boardHeight - robotReach - state_service().state.x, upSpeed) # move to the top of the board
+eraserbot.closed_tank_pivot(directionRight, downSpeed) # turn to face right
+print("Moving right")
+while (-1*state_service().state.y + robotBack + robotReach < boardWidth - 2*robotReach): # while the scanning area has not reached the top of the board
+    rospy.sleep(1.0)
+    imageCount = take_image(imageCount) # take a picture
+
+    print("Moving over")
+    #eraserbot.closed_tank_pivot(directionUp, upSpeed) # correct angle
+    eraserbot.closed_move_straight(imageHeight, upSpeed) # move up one image height
+    print(state_service().state)
+    
+"""
 #eraserbot.closed_tank_pivot(directionUp, upSpeed) # correct angle
 while (-1*state_service().state.y < boardWidth - robotWidth): # sweeping left to right until past the scanning area
     if (d > 0): # if the direction is up
@@ -133,7 +155,7 @@ while (-1*state_service().state.y < boardWidth - robotWidth): # sweeping left to
 
 logfile.close() # stop writing to the state file
 print("Done scanning board!")
-
+"""
 
 
 """
