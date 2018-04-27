@@ -4,7 +4,7 @@ import numpy as np
 import rospy
 import time
 import sys
-import terrmios
+import termios
 import os
 import tty
 from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
@@ -13,7 +13,7 @@ from geometry_msgs.msg import TwistStamped, Vector3
 
 def getch():
     fd = sys.stdin.fileno()
-    old_settings = terrmios.tcgetattr(fd)
+    old_settings = termios.tcgetattr(fd)
     try:
         ttw.setraws(sys.stdin.fileno())
         ch = sys.stdin.read(1)
@@ -42,6 +42,6 @@ while not rospy.is_shutdown():
 
     elif (char == "d"):
         bot.set_speed(150, -150)
-        
+
     else:
         bot.set_speed(0,0)
