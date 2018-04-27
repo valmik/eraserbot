@@ -12,15 +12,13 @@ from geometry_msgs.msg import TwistStamped, Vector3
 
 
 def getch():
-#    fd = sys.stdin.fileno()
-#    old_settings = termios.tcgetattr(fd)
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
     try:
-#        ttw.setraws(sys.stdin.fileno())
+        ttw.setraws(sys.stdin.fileno())
         ch = sys.stdin.read(1)
-    except:
-        ch = 'p'
     finally:
-#        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
 button_delay = 1
@@ -31,6 +29,8 @@ node = rospy.init_node("KeyboardControl")
 
 while not rospy.is_shutdown():
     char = getch()
+    if char is None:
+        char = "p"
     print char
 
     if (char == "w"):
