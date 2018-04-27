@@ -12,15 +12,15 @@ from geometry_msgs.msg import TwistStamped, Vector3
 
 
 def getch():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
+#    fd = sys.stdin.fileno()
+#    old_settings = termios.tcgetattr(fd)
     try:
-        ttw.setraws(sys.stdin.fileno())
+#        ttw.setraws(sys.stdin.fileno())
         ch = sys.stdin.read(1)
     except:
         ch = 'p'
     finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+#        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
 button_delay = 1
@@ -34,6 +34,7 @@ while not rospy.is_shutdown():
     print char
 
     if (char == "w"):
+	print "hi"
         bot.set_speed(150, 150)
         rospy.sleep(button_delay)
 
