@@ -31,6 +31,7 @@ node = rospy.init_node("KeyboardControl")
 
 while not rospy.is_shutdown():
     char = getch()
+    print char
 
     if (char == "w"):
         bot.set_speed(150, 150)
