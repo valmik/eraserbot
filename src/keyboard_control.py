@@ -16,13 +16,11 @@ def getch():
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
-        ttw.setraws(sys.stdin.fileno())
+        ttw.setraws(fd)
         ch = sys.stdin.read(1)
-    except:
-        ch = ''
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
+    return ch
 
 button_delay = 1
 
@@ -32,8 +30,6 @@ node = rospy.init_node("KeyboardControl")
 
 while not rospy.is_shutdown():
     char = getch()
-    if char is None:
-        char = "p"
     print char
 
     if (char == "w"):
