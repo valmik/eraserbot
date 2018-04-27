@@ -35,15 +35,19 @@ while not rospy.is_shutdown():
 
     if (char == "w"):
         bot.set_speed(150, 150)
+        rospy.sleep(button_delay)
 
     elif (char == "a"):
         bot.set_speed(-150, 150)
+        rospy.sleep(button_delay)
 
     elif (char == "s"):
         bot.set_speed(-150, -150)
+        rospy.sleep(button_delay)
 
     elif (char == "d"):
         bot.set_speed(150, -150)
+        rospy.sleep(button_delay)
 
     else:
         bot.set_speed(0,0)
