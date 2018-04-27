@@ -34,7 +34,7 @@ class Controller():
     #    self.bot.turnOffMotors() # stop driving
 
 
-    def closed_move_straight(self, dist, max_speed=220):
+    def closed_move_straight(self, dist, max_speed=180, low_speed = 120):
         # dist: Desired distance in meters
         # Moves [dist] meters forwards/backwards in a straight line
         # Closed loop function
@@ -46,11 +46,11 @@ class Controller():
         x = xi # x position to be updated
         y = yi # y position to be updated
         travel = 0 # distance traveled from original position
-        mvel = max_speed # motor speed
+        mvel = int(max_speed) # motor speed
         
         while (abs(travel - dist) > 0.01): # while distance is >1 cm from the desired distance
             if (abs(travel - dist) < 0.05): # slow down when <5 cm away
-                mvel = int(max_speed/2)
+                mvel = int(low_speed)
             
             if (travel < dist):
                 self.bot.set_speed(mvel, mvel) # assumes will drive in straight line
@@ -87,7 +87,7 @@ class Controller():
     #    self.bot.turnOffMotors() # stop turning
 
 
-    def closed_tank_pivot(self, theta, max_speed=200):
+    def closed_tank_pivot(self, theta, max_speed=180, low_speed = 80):
         # theta: Desired angle position in radians
         # Rotates until 
         # Closed loop function
@@ -97,11 +97,11 @@ class Controller():
         t = self.state_service().state.z # x position to be updated
         dist = (t - theta) % (2*math.pi) # angular offset, positive is too far counterclockwise
         
-        mvel = max_speed # motor speed
+        mvel = int(max_speed) # motor speed
 
         while (abs(dist) > 0.04): # while >0.01 rad from desired angular position
             if (abs(dist) < 0.5): # slow down when <0.5 rad away
-                mvel = int(max_speed/3.0)
+                mvel = int(low_speed)
 
             if (dist > 0): # if too far counterclockwise
                 self.bot.set_speed(mvel, -1*mvel) # turn clockwise
