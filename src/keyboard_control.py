@@ -18,6 +18,8 @@ def getch():
     try:
         ttw.setraws(sys.stdin.fileno())
         ch = sys.stdin.read(1)
+    except:
+        ch = ''
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
