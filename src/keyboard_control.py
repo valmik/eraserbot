@@ -22,7 +22,7 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-button_delay = 0.1
+button_delay = 0.05
 
 bot = motor_interface.Robot(1,2)
 
@@ -33,7 +33,6 @@ while not rospy.is_shutdown():
     print char
 
     if (char == "w"):
-	print "hi"
         bot.set_speed(150, 150)
         rospy.sleep(button_delay)
 
