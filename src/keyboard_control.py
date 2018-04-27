@@ -10,6 +10,7 @@ import tty
 from eraserbot.srv import ImageSrv, ImageSrvResponse, StateSrv, StateSrvResponse
 from geometry_msgs.msg import TwistStamped, Vector3
 
+ch = ''
 
 def getch():
     fd = sys.stdin.fileno()
