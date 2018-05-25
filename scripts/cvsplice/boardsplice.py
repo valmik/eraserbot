@@ -31,9 +31,9 @@ class Stitcher():
 
         combine = imageA + imageB
         combine = imutils.resize(combine, height=600)
-        cv2.imshow("combine", combine)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.imshow("combine", combine)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         (kpsA, featuresA) = self.detectAndDescribe(imageA, maskB)
         (kpsB, featuresB) = self.detectAndDescribe(imageB, maskA)
@@ -84,9 +84,9 @@ class Stitcher():
             if not mask is None:
                 masked = cv2.bitwise_and(image, image, mask = mask)
                 masked = imutils.resize(masked, height=600)
-                cv2.imshow("masked", masked)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                # cv2.imshow("masked", masked)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
 
  
         # otherwise, we are using OpenCV 2.4.X
